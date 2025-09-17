@@ -1,19 +1,17 @@
 import express from "express";
+const router = express.Router();
 
-
-const Router = express.Router();
-
-Router.get("/api/auth/signup",(req,res)=>{
-    res.send("signup endpoint page")
+// Don't include /api/auth here, it's already prefixed in server.js
+router.get("/signup", (req, res) => {
+  res.send("Signup endpoint page");
 });
 
-Router.get("/api/auth/login",(req,res)=>{
-    res.send("signup endpoint page")
+router.get("/login", (req, res) => {
+  res.send("Login endpoint page");
 });
 
-Router.get("/api/auth/logout",(req,res)=>{
-    res.send("logout endpoint page")
+router.get("/logout", (req, res) => {
+  res.send("Logout endpoint page");
 });
 
-
-export default Router;
+export default router;
