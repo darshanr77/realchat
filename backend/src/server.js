@@ -1,8 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
-import authRoutes from './routes/auth.route.js';
-import messageRoutes from './routes/message.route.js';
-import path from 'path';
+import authRoutes from "./routes/auth.route.js";
+import messageRoutes from "./routes/message.route.js";
+import path from "path";
+import { connectDB } from "./lib/db.js";
 
 const __dirname = path.resolve();
 
@@ -14,19 +15,24 @@ const PORT = process.env.PORT || 3000;
 // Middleware to parse JSON
 app.use(express.json());
 
-// Mount API routes
+// ✅ Mount API routes first
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-// Serve frontend in production
+// ✅ Serve frontend in production (only for non-API routes)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  app.get("*", (_, res) => { 
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) {
+      // let API handle it, don't send frontend for /api requests
+      return next();
+    }
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
-};
+}
 
-app.listen(PORT, () => {
-  console.log("Server is running on port: " + PORT);
-});
+app.listen(PORT,()=>{
+  console.log("server is running on port:",PORT);
+  connectDB();
+})
