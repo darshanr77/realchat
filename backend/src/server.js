@@ -10,16 +10,16 @@ const __dirname = path.resolve();
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // Middleware to parse JSON
 app.use(express.json());
 
-// ✅ Mount API routes first
+//  Mount API routes first
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-// ✅ Serve frontend in production (only for non-API routes)
+//  Serve frontend in production (only for non-API routes)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
@@ -35,4 +35,4 @@ if (process.env.NODE_ENV === "production") {
 app.listen(PORT,()=>{
   console.log("server is running on port:",PORT);
   connectDB();
-})
+});
