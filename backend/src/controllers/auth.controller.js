@@ -1,6 +1,6 @@
-import { generateToken } from "../lib/Utils.js";
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import User from "../models/User.js";
-import bcrypt from 'bcryptjs'
 
 export const signup = async (req, res) => {
   try {
@@ -63,51 +63,69 @@ export const signup = async (req, res) => {
     });
   } catch (error) {
     console.error("Signup error:", error);
+    
+    // Handle duplicate key error specifically
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        message: "User with this email already exists" 
+      });
+    }
+    
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const login = async () => {
-    try{
-      const {email,password} = req.body;
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-      if(!email || !password){
-        return res.status(400).json({message:"All feilds are required"});
-      }
-
-      const user = await User.findOne({email:email});
-
-      if(!user){
-        return res.status(400).json({message:"You have not signed up"});
-      }
-
-      const samePassword = await bcrypt.compare(password,user.password);
-
-      if(!samePassword){
-        return res.status(400).json({message:"Invalid password"});
-      }
-
-    }catch(error){
-      console.log("Error in loging in",error);
-      res.status(500).json({message:"Internal server"});
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
     }
+
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      return res.status(400).json({ message: "You have not signed up" });
+    }
+
+    const samePassword = await bcrypt.compare(password, user.password);
+
+    if (!samePassword) {
+      return res.status(400).json({ message: "Invalid password" });
+    }
+
+    // Generate JWT token for login
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profilePic: user.profilePic || null,
+      },
+    });
+
+  } catch (error) {
+    console.log("Error in logging in", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-
-export const logout = async () => {
-    try{
-
-    }catch(error){
-
-    }
+export const logout = async (req, res) => {
+  try {
+    // For JWT tokens, logout is typically handled on the client side
+    // by removing the token from storage
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.log("Error in logging out", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
-
-
-
-
-
-
-
-
-
-
