@@ -1,4 +1,5 @@
 import express from "express";
+import dotenv from "dotenv"
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import path from "path";
@@ -7,7 +8,7 @@ import { ENV } from "./lib/env.js";
 
 const __dirname = path.resolve();
 
-
+dotenv.config();
 
 const app = express();
 const PORT = ENV.PORT || 4000;
