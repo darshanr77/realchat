@@ -5,6 +5,7 @@ import messageRoutes from "./routes/message.route.js";
 import path from "path";
 import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
+import cookieParser from "cookie-parser"
 
 const __dirname = path.resolve();
 
@@ -15,6 +16,7 @@ const PORT = ENV.PORT || 4000;
 
 // Middleware to parse JSON
 app.use(express.json());
+app.use(cookieParser());
 
 //  Mount API routes first
 app.use("/api/auth", authRoutes);
